@@ -30,12 +30,6 @@ A Task Management web application built with Django, designed to help manage tas
 
 - Subtasks:Create subtasks linked to parent tasks
 
-- Task Notes / Comments: Add additional notes or comments per task
-
-- Priority Colors: Color-code tasks based on priority level
-
-- Due Date Reminders: Display tasks due in next X days (simple reminder system)
-
 - Import Tasks from CSV: Upload CSV files to bulk import tasks
 
 - Progress Tracker: Show completion percentage of all tasks
