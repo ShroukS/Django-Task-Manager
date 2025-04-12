@@ -14,4 +14,11 @@
 
     <a href="{% url 'task_list' %}">Back to List</a>
 </body>
+<label for="category">Category:</label>
+<select name="category" id="category">
+    {% for value, name in form.category.field.choices %}
+        <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>{{ name }}</option>
+    {% endfor %}
+</select>
+
 </html>

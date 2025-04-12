@@ -1,43 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Manager</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
 </head>
 <body>
-    <h1>Task List</h1>
 
-    <a href="{% url 'task_create' %}">Create Task</a> |
-    <a href="{% url 'export_tasks_csv' %}">Export to CSV</a>
+    <h1>Task Manager</h1>
+    {% load tz %}
+    {% now "Y-m-d" as today %}
 
-    <form method="get">
-        <select name="status">
+
+    <div>
+        <!-- Add New Task Button -->
+        <a href="{% url 'task_create' %}" class="btn">Add New Task</a>
+    
+        <!-- Export to CSV Button -->
+        <a href="{% url 'export_tasks_csv' %}" class="btn">Export to CSV</a>
+
+        <!-- Import from CSV Button -->
+        <a href="{% url 'import_csv' %}" class="btn btn-primary">Import CSV</a>
+
+    </div>
+
+    <!--Progress Tracking-->
+    <div>
+        <h3>Task Completion Progress</h3>
+        <p>{{ completion_percentage|floatformat:2 }}% of tasks completed</p>
+        <div style="width: 100%; background-color: #e0e0e0;">
+            <div style="width: {{ completion_percentage }}%; background-color: #76c7c0; text-align: center; padding: 5px 0; color: white;">
+                {{ completion_percentage|floatformat:2 }}%
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- FILTER & SORT FORM -->
+    <form method="GET">
+        <label for="search">Search:</label>
+        <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Search tasks...">
+    
+
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+            <option value="">All Categories</option>
+            {% for value, name in categories %}
+                <option value="{{ value }}" {% if request.GET.category == value %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="status">Status:</label>
+        <select name="status" id="status">
             <option value="">All</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
+            <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Completed</option>
+            <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>Pending</option>
         </select>
 
-        <select name="sort">
-            <option value="">No Sort</option>
-            <option value="priority">Sort by Priority</option>
-            <option value="due_date">Sort by Due Date</option>
+        <label for="sort_by">Sort By:</label>
+        <select name="sort_by" id="sort_by">
+            <option value="">None</option>
+            <option value="title" {% if request.GET.sort_by == "title" %}selected{% endif %}>Title</option>
+            <option value="priority" {% if request.GET.sort_by == "priority" %}selected{% endif %}>Priority</option>
+            <option value="due_date" {% if request.GET.sort_by == "due_date" %}selected{% endif %}>Due Date</option>
         </select>
 
-        <button type="submit">Filter</button>
+        <button type="submit">Apply</button>
     </form>
 
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <strong>{{ task.title }}</strong> - {{ task.priority }} - 
-                {% if task.completed %}✅{% else %}❌{% endif %}
-                (Due: {{ task.due_date }})
-                <a href="{% url 'task_edit' task.pk %}">Edit</a>
-                <a href="{% url 'task_delete' task.pk %}">Delete</a>
-                <a href="{% url 'task_toggle' task.pk %}">
-                    {% if task.completed %}Mark Incomplete{% else %}Mark Complete{% endif %}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    <!-- TASK LIST -->
+    <form method="POST" action="{% url 'bulk_actions' %}">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select_all"> Select All</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    {% if task.completed %}
+                    <tr style="background-color: #b7ffc6;">
+                    {% else %}
+                        <tr {% if task.overdue %}style="background-color: #ffcccc;"{% elif task.due_today %}style="background-color: #fc6565;"{% endif %}>
+                    {% endif %}
+                        <td><input type="checkbox" name="selected_tasks" value="{{ task.id }}"></td>
+                        <td>{{ task.title }}</td>
+                        <td>{{ task.description }}</td>
+                        <td>{{ task.due_date|default:"N/A" }}</td>
+                        <td>{{ task.get_priority_display }}</td>
+                        <td>{% if task.completed %}✔ Completed{% else %}❌ Pending{% endif %}</td>
+                        <td>
+                            <a href="{% url 'task_edit' task.id %}">Edit</a> |
+                            <a href="{% url 'task_delete' task.id %}">Delete</a>
+                        </td>
+                    </tr>
+                    
+                    <!-- Display Subtasks -->
+                    {% for subtask in task.subtasks.all %}
+                    {% if subtask.completed %}
+                    <tr style="background-color: #b7ffc6;">
+                    {% else %}
+                        <tr {% if task.overdue %}style="background-color: #ffcccc;"{% elif task.due_today %}style="background-color: #fc6565;"{% endif %}>
+                    {% endif %}
+                    <!--tr class="{% if not subtask.completed and subtask.due_date and subtask.due_date < today %}overdue{% elif not subtask.completed %}priority-{{ subtask.priority }}{% endif %}"-->
+                        <td><input type="checkbox" name="selected_tasks" value="{{ subtask.id }}"></td>
+                        <td style="padding-left: 30px;">↳ {{ subtask.title }}</td>
+                        <td>{{ subtask.description }}</td>
+                        <td>{{ subtask.due_date|default:"N/A" }}</td>
+                        <td>{{ subtask.get_priority_display }}</td>
+                        <td>{% if subtask.completed %}✔ Completed{% else %}❌ Pending{% endif %}</td>
+                        <td>
+                            <a href="{% url 'task_edit' subtask.id %}">Edit</a> |
+                            <a href="{% url 'task_delete' subtask.id %}">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <!-- Bulk Action Controls -->
+        <div>
+            <button type="submit" name="action" value="complete">Mark as Complete</button>
+            <button type="submit" name="action" value="delete">Delete Selected</button>
+        </div>
+    </form>
+    <script>
+        document.getElementById('select_all').onclick = function() {
+            var checkboxes = document.querySelectorAll('input[name="selected_tasks"]');
+            for (var checkbox of checkboxes) {
+                checkbox.checked = this.checked;
+            }
+        }
+    </script>
+    
+
 </body>
 </html>
