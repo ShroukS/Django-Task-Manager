@@ -33,6 +33,7 @@ A Task Management web application built with Django, designed to help manage tas
 - Import Tasks from CSV: Upload CSV files to bulk import tasks
 
 - Progress Tracker: Show completion percentage of all tasks
+- Creating Restful API: GET request to retrieve a list of all tasks, and POST request to create a new task.
 
 ### Setup Instructions
 1. Clone the repo:
