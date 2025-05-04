@@ -71,6 +71,5 @@ venv\Scripts\activate     # Windows
 
 Visit: http://127.0.0.1:8000/
 
-7. To run the BDD test cases:
->cd features
+7. To run the BDD test cases: open a new terminal in features/ then run behave:
 >behave
