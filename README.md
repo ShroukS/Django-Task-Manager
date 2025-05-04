@@ -35,6 +35,11 @@ A Task Management web application built with Django, designed to help manage tas
 - Progress Tracker: Show completion percentage of all tasks
 - Creating Restful API: GET request to retrieve a list of all tasks, and POST request to create a new task.
 
+### BDD Testing
+- Task Creation
+- Single Tasks Edit And Delete
+- Bulk Tasks Actions
+
 ### Setup Instructions
 1. Clone the repo:
 
@@ -52,7 +57,7 @@ venv\Scripts\activate     # Windows
 
 3. Install Dependencies:
 
->pip install django
+>pip install django behave selenium django-behave
 
 4. Apply Migrations:
 
@@ -65,3 +70,7 @@ venv\Scripts\activate     # Windows
 6. Access the App:
 
 Visit: http://127.0.0.1:8000/
+
+7. To run the BDD test cases:
+>cd features
+>behave
