@@ -39,10 +39,16 @@
         </form>
     
         <!-- Export to CSV Button -->
-        <a href="{% url 'export_tasks_csv' %}" class="btn">Export to CSV</a>
+        {% comment %} <a href="{% url 'export_tasks_csv' %}" class="btn">Export to CSV</a> {% endcomment %}
+        <form action="{% url 'export_tasks_csv' %}" method="get" style="display: inline;">
+            <button type="submit" class="btn">Export to CSV</button>
+        </form>
 
         <!-- Import from CSV Button -->
-        <a href="{% url 'import_csv' %}" class="btn btn-primary">Import CSV</a>
+        {% comment %} <a href="{% url 'import_csv' %}" class="btn btn-primary">Import CSV</a> {% endcomment %}
+        <form action="{% url 'import_csv' %}" method="get" style="display: inline;">
+            <button type="submit" class="btn">Import CSV</button>
+        </form>
 
     </div>
 

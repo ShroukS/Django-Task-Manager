@@ -1,0 +1,47 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.12.9]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y chromium-browser chromium-chromedriver
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Tests
+      run: |
+        python manage.py makemigrations
+        python manage.py migrate
+
+    - name: Start Django Server in Background
+      run: |
+        nohup python manage.py runserver 0.0.0.0:8000 &
+        sleep 5  # give server time to start
+    
+    - name: Run Behave Tests
+      run: behave features/
+    
+    - name: Stop Django Server
+      run: |
+        pkill -f runserver || true
