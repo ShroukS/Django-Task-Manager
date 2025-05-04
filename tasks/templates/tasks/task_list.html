@@ -33,7 +33,10 @@
 
     <div>
         <!-- Add New Task Button -->
-        <a href="{% url 'task_create' %}" class="btn">Add New Task</a>
+        {% comment %} <a href="{% url 'task_create' %}" class="btn">Add New Task</a> {% endcomment %}
+        <form action="{% url 'task_create' %}" method="get" style="display: inline;">
+            <button type="submit" class="btn">Add New Task</button>
+        </form>
     
         <!-- Export to CSV Button -->
         <a href="{% url 'export_tasks_csv' %}" class="btn">Export to CSV</a>
@@ -116,8 +119,13 @@
                         <td>{{ task.get_priority_display }}</td>
                         <td>{% if task.completed %}✔ Completed{% else %}❌ Pending{% endif %}</td>
                         <td>
-                            <a href="{% url 'task_edit' task.id %}">Edit</a> |
-                            <a href="{% url 'task_delete' task.id %}">Delete</a>
+                            <form method="get" action="{% url 'task_edit' task.id %}" style="display:inline;">
+                                <button type="submit" class="btn btn-primary">Edit</button>
+                            </form>
+                            <form method="get" action="{% url 'task_delete' task.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
                         </td>
                     </tr>
                     
@@ -136,8 +144,13 @@
                         <td>{{ subtask.get_priority_display }}</td>
                         <td>{% if subtask.completed %}✔ Completed{% else %}❌ Pending{% endif %}</td>
                         <td>
-                            <a href="{% url 'task_edit' subtask.id %}">Edit</a> |
-                            <a href="{% url 'task_delete' subtask.id %}">Delete</a>
+                            <form method="get" action="{% url 'task_edit' task.id %}" style="display:inline;">
+                                <button type="submit" class="btn btn-primary">Edit</button>
+                            </form>
+                            <form method="get" action="{% url 'task_delete' task.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}
