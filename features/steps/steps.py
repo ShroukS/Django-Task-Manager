@@ -176,7 +176,7 @@ def step_impl(context):
 def step_impl(context, task1, task2):
     def not_present(task):
         try:
-            sleep(2)
+            sleep(10)
             WebDriverWait(context.browser, 10).until(
                 EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), task)
             )
