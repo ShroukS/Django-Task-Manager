@@ -57,7 +57,7 @@ venv\Scripts\activate     # Windows
 
 3. Install Dependencies:
 
->pip install django behave selenium django-behave
+>pip install django behave selenium
 
 4. Apply Migrations:
 
