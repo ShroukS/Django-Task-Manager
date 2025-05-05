@@ -24,7 +24,6 @@ def step_impl(context):
 
 @then('I should see "Create Task" listed on the dashboard')
 def step_impl(context):
-    # TODO: Redirect to the dashboard url 'http://127.0.0.1:8000/create/'
     WebDriverWait(context.browser, 10).until(
         EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), "Create Task")
     )
@@ -71,7 +70,6 @@ def step_impl(context):
 
 @then('I should be redirected to "Home" page')
 def step_impl(context):
-    # TODO: Redirect to the dashboard url
     WebDriverWait(context.browser, 10).until(
         EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), "Task Manager")
     )
@@ -97,7 +95,6 @@ def step_impl(context, task):
 
 @then('I should be redirected to "Edit Task" page')
 def step_impl(context):
-    # TODO: Redirect to the dashboard url
     WebDriverWait(context.browser, 10).until(
         EC.text_to_be_present_in_element((By.TAG_NAME, 'body'), "Edit Task")
     )
@@ -126,7 +123,6 @@ def step_impl(context):
 
 @then('I should "✔ Completed" statuses for tasks "{task1} and "{task2}"')
 def step_impl(context, task1, task2):
-    sleep(10)
     for task in [task1, task2]:
         row_xpath = f'//tr[td[contains(text(), "{task}")]]'
         status_xpath = f'{row_xpath}/td[contains(text(), "✔ Completed")]'

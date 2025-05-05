@@ -16,5 +16,4 @@ urlpatterns = [
     path('export/', views.export_tasks_csv, name='export_tasks_csv'),
     path('api/tasks/', TaskListCreateView.as_view(), name='task-list-create'),
     path('api/tasks/<int:pk>/', TaskDetailView.as_view(), name='task-detail'),
-    #path('', include('tasks.urls')),
 ]
